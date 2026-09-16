@@ -118,15 +118,35 @@
   @media (prefers-reduced-motion: reduce) {
     .sheet { transition: none; }
   }
+
+  /* first-open welcome */
+  .welcome { position: fixed; inset: 0; z-index: 50; display: none; flex-direction: column; justify-content: flex-end;
+    padding: 0 24px calc(28px + env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(42,26,77,0.55), var(--sky-bottom) 70%); color: var(--ink); }
+  .welcome.on { display: flex; }
+  .welcome h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 2.2rem; line-height: 1.05; margin: 0 0 10px; }
+  .welcome p { font-family: 'Manrope', sans-serif; font-size: 1.05rem; line-height: 1.45; color: var(--ink-soft); margin: 0 0 28px; max-width: 30ch; }
+  .welcome .dots { display: flex; gap: 8px; margin-bottom: 18px; }
+  .welcome .dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+  .welcome .dots i.on { background: var(--earns); }
+  .welcome button { width: 100%; min-height: 56px; border: 0; border-radius: 16px; background: var(--earns); color: #12091f;
+    font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 1.05rem; }
+  .welcome button:active { transform: scale(0.98); }
 </style>
 </head>
 <body>
 <div class="hud">
-  <h1 class="title">Jarvis<small>10 clusters, 73 threads</small></h1>
+  <h1 class="title">Jarvis<small>10 clusters, 76 threads</small></h1>
   <button class="ar" id="arBtn" type="button">View in your room</button>
 </div>
 <div class="now" id="now" aria-live="polite"></div>
 <div class="hint" id="hint">Tap an orb</div>
+<div class="welcome" id="welcome" role="dialog" aria-modal="true">
+  <div class="dots" id="wDots"><i class="on"></i><i></i><i></i></div>
+  <h2 id="wTitle"></h2>
+  <p id="wBody"></p>
+  <button id="wBtn" type="button"></button>
+</div>
+
 <div class="rec-tip">Recording view. Long-press anywhere to exit.</div>
 
 <section class="sheet" id="sheet" aria-live="polite">
@@ -587,6 +607,30 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
   }
+
+  // First-open welcome: 3 screens, one button, shown once.
+  (function welcome() {
+    const KEY = 'jarvis-welcomed';
+    try { if (localStorage.getItem(KEY)) return; } catch (e) { return; }
+    const S = [
+      ['Your life, as a map.', 'Ten orbs. Each one is a part of your world.', 'Next'],
+      ['Tap an orb.', 'It opens. The small orbs inside are the things you are working on.', 'Next'],
+      ['Nothing to manage here.', 'The map updates itself from your notes. Just look.', 'Start'],
+    ];
+    const el = document.getElementById('welcome'), t = document.getElementById('wTitle'),
+          b = document.getElementById('wBody'), btn = document.getElementById('wBtn'),
+          dots = document.getElementById('wDots').children;
+    let i = 0;
+    const show = () => { t.textContent = S[i][0]; b.textContent = S[i][1]; btn.textContent = S[i][2];
+      [...dots].forEach((d, k) => d.classList.toggle('on', k === i)); };
+    btn.addEventListener('click', () => {
+      if (navigator.vibrate) navigator.vibrate(8);
+      if (i < S.length - 1) { i++; show(); return; }
+      try { localStorage.setItem(KEY, '1'); } catch (e) {}
+      el.classList.remove('on');
+    });
+    show(); el.classList.add('on');
+  })();
   boot();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 })();
