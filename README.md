@@ -1,6 +1,8 @@
 # Jarvis Cockpit
 
-3D map of Shama's life clusters with a live Vedic timing layer. Static site, no build step.
+Live demo: https://jarvis-cockpit-theta.vercel.app/?demo=1
+
+3D map of your life clusters with a live Vedic timing layer. Fork it, edit clusters.json (or connect Notion), deploy. Static site, no build step.
 
 ## Deploy (once)
 1. Upload this folder to a new GitHub repo (github.com/new, then "uploading an existing file").
@@ -14,7 +16,7 @@ Edit `clusters.json` on GitHub (pencil icon works from the phone). Vercel redepl
 
 Shape of `clusters.json`:
 ```json
-[{ "name": "Career", "kind": "earns", "threads": ["Telia", "Curamando"] }]
+[{ "name": "Career", "kind": "earns", "threads": ["Thread one", "Thread two"] }]
 ```
 `kind` is one of `earns` (teal), `soul` (pink), `admin` (grey).
 
