@@ -180,6 +180,7 @@
   const CSS = { earns: 'var(--earns)', soul: 'var(--soul)', admin: 'var(--admin)' };
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const DEMO = new URLSearchParams(location.search).get('demo') === '1';
 
   async function boot() {
   try {
@@ -187,6 +188,8 @@
     if (!r || !r.ok) r = await fetch('./clusters.json?t=' + Date.now(), { cache: 'no-store' });
     if (r && r.ok) { const j = await r.json(); if (Array.isArray(j) && j.length) CLUSTERS = j; }
   } catch (e) { /* offline or local file: keep fallback */ }
+  // Demo mode (?demo=1): same clusters and counts, generic thread names. For public recordings.
+  if (DEMO) CLUSTERS = CLUSTERS.map(c => ({ ...c, threads: c.threads.map((_, i) => c.name.split(' ')[0] + ' thread ' + (i + 1)) }));
   const total_threads = CLUSTERS.reduce((a, c) => a + c.threads.length, 0);
   document.querySelector('.title small').textContent = CLUSTERS.length + ' clusters, ' + total_threads + ' threads';
 
@@ -611,7 +614,7 @@
   // First-open welcome: 3 screens, one button, shown once.
   (function welcome() {
     const KEY = 'jarvis-welcomed';
-    try { if (localStorage.getItem(KEY)) return; } catch (e) { return; }
+    try { if (!DEMO && localStorage.getItem(KEY)) return; } catch (e) { return; }
     const S = [
       ['Your life, as a map.', 'Ten orbs. Each one is a part of your world.', 'Next'],
       ['Tap an orb.', 'It opens. The small orbs inside are the things you are working on.', 'Next'],
@@ -626,7 +629,7 @@
     btn.addEventListener('click', () => {
       if (navigator.vibrate) navigator.vibrate(8);
       if (i < S.length - 1) { i++; show(); return; }
-      try { localStorage.setItem(KEY, '1'); } catch (e) {}
+      if (!DEMO) { try { localStorage.setItem(KEY, '1'); } catch (e) {} }
       el.classList.remove('on');
     });
     show(); el.classList.add('on');
