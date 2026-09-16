@@ -20,3 +20,12 @@ Shape of `clusters.json`:
 
 ## Day-lord rule
 Sun Founder, Mon Family, Tue Career, Wed Products, Thu Wealth, Fri Content, Sat Spirituality. Edit `DAY_CLUSTER` in `index.html` to remap.
+
+## Install as an app (PWA)
+iPhone: open the site in Safari, Share, "Add to Home Screen". Android: Chrome menu, "Install app". Works offline, opens full screen.
+
+## Live auto-update from Notion (no scheduler needed)
+1. Create a Notion database "Jarvis Threads" with columns: Name (title), Cluster (select), Kind (select: earns / soul / admin), Status (select: active / parked / shipped).
+2. notion.so/my-integrations: new internal integration, copy the secret. Share the database with that integration (database ... menu, Connections).
+3. In Vercel project Settings > Environment Variables add NOTION_TOKEN and NOTION_DB (the 32-char id from the database URL). Redeploy once.
+The cockpit now reads /api/clusters, cached 5 minutes. Edit Notion, the map follows. If Notion is unreachable it falls back to clusters.json.
